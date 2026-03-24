@@ -39,10 +39,10 @@ global:
     fullnameOverride: ""
 
     auth:
-      postgresPassword: ""
-      username: ""
-      password: ""
-      database: ""
+      postgresPassword: "admin@123"
+      username: "appuser"
+      password: "app@123"
+      database: "qadevvm02"
       existingSecret: ""
       secretKeys:
         adminPasswordKey: ""
@@ -123,7 +123,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: bitnami/postgresql
-  tag: 17.6.0-debian-12-r4
+  tag: 16.11.0-debian-12-r4
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -191,7 +191,7 @@ auth:
   usePasswordFiles: true
 ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
 ##
-architecture: standalone
+architecture: replication
 ## Replication configuration
 ## Ignored if `architecture` is `standalone`
 ##
@@ -320,9 +320,23 @@ tls:
 ## @section PostgreSQL Primary parameters
 ##
 primary:
+  configuration: |-
+    max_connections = 500
+    shared_buffers = 128MB
+    work_mem = 4MB
+    maintenance_work_mem = 64MB
+    effective_cache_size = 4GB
+readReplicas:
+  replicaCount: 1
+  extendedConfiguration: |-
+    max_connections = 500
+    shared_buffers = 128MB
+    work_mem = 4MB
+    maintenance_work_mem = 64MB
+    effective_cache_size = 4GB    
   ## @param primary.name Name of the primary database (eg primary, master, leader, ...)
   ##
-  name: primary
+  name: qadevvm02
   ## @param primary.configuration PostgreSQL Primary main configuration to be injected as ConfigMap
   ## ref: https://www.postgresql.org/docs/current/static/runtime-config.html
   ##
@@ -827,7 +841,7 @@ primary:
       - ReadWriteOnce
     ## @param primary.persistence.size PVC Storage Request for PostgreSQL volume
     ##
-    size: 8Gi
+    size: 256Gi
     ## @param primary.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
@@ -861,7 +875,7 @@ primary:
 readReplicas:
   ## @param readReplicas.name Name of the read replicas database (eg secondary, slave, ...)
   ##
-  name: read
+  name: qadevvm02replica
   ## @param readReplicas.replicaCount Number of PostgreSQL read only replicas
   ##
   replicaCount: 1
@@ -1281,7 +1295,7 @@ readReplicas:
       - ReadWriteOnce
     ## @param readReplicas.persistence.size PVC Storage Request for PostgreSQL volume
     ##
-    size: 8Gi
+    size: 256Gi
     ## @param readReplicas.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
